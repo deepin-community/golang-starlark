@@ -1,5 +1,99 @@
-template-repository (1.0-1) unstable; urgency=medium
+golang-starlark (0.0~git20230726.7dadff3-2) unstable; urgency=medium
 
-  * Initial release
+  * Team upload
+  * Build-depend on tzdata-legacy (Closes: #1052810)
 
- -- Tsic404 <liuheng@deepin.org>  Sat, 28 Jan 2023 13:46:49 +0800
+ -- Shengjing Zhu <zhsj@debian.org>  Fri, 06 Oct 2023 19:22:31 +0800
+
+golang-starlark (0.0~git20230726.7dadff3-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream snapshot
+  * Add golang-google-protobuf-dev to dependencies
+  * Update section to golang
+  * Update debhelper-compat to 13
+  * Update Standards-Version to 4.6.2 (no changes)
+
+ -- Shengjing Zhu <zhsj@debian.org>  Fri, 28 Jul 2023 22:44:44 +0800
+
+golang-starlark (0.0~git20210122.f935de8-2) unstable; urgency=medium
+
+  [ Roger Shimizu ]
+  * d/control: For golang-starlark-dev add Multi-Arch: foreign
+
+ -- Jelmer Vernooĳ <jelmer@debian.org>  Tue, 29 Nov 2022 20:45:29 +0000
+
+golang-starlark (0.0~git20210122.f935de8-1) unstable; urgency=medium
+
+  * New upstream release 0.0_git20210122.f935de8
+
+ -- Roger Shimizu <rosh@debian.org>  Mon, 25 Jan 2021 00:49:48 +0900
+
+golang-starlark (0.0~git20201210.e81fc95-2) unstable; urgency=medium
+
+  * debian/control:
+    - Revert Adding B-D golang-google-protobuf-dev
+  * debian/patches:
+    - Add patch to revert dependency on golang-google-protobuf-dev
+      Since Bug #961814
+
+ -- Roger Shimizu <rosh@debian.org>  Sat, 19 Dec 2020 23:16:06 +0900
+
+golang-starlark (0.0~git20201210.e81fc95-1) unstable; urgency=medium
+
+  * New upstream release 0.0~git20201210.e81fc95
+    - add parameter to bench_xyz(b) benchmark functions.
+    - lib/proto: a Starlark package for protobuf processing.
+  * debian/control:
+    - Add B-D: golang-google-protobuf-dev
+
+ -- Roger Shimizu <rosh@debian.org>  Mon, 14 Dec 2020 03:15:36 +0900
+
+golang-starlark (0.0~git20201118.e55f603-2) unstable; urgency=medium
+
+  * debian/control:
+    - Add B-D: golang-golang-x-sys-dev
+
+ -- Roger Shimizu <rosh@debian.org>  Mon, 23 Nov 2020 09:04:54 +0900
+
+golang-starlark (0.0~git20201118.e55f603-1) unstable; urgency=medium
+
+  * New upstream release 0.0~git20201118.e55f603
+  * Remove d/gbp.conf since we do not use pristine-tar anymore
+
+ -- Roger Shimizu <rosh@debian.org>  Mon, 23 Nov 2020 01:51:09 +0900
+
+golang-starlark (0.0~git20201014.dff0ae5-1) unstable; urgency=medium
+
+  * New upstream 0.0~git20201014.dff0ae5
+
+ -- Roger Shimizu <rosh@debian.org>  Sun, 08 Nov 2020 00:32:47 +0900
+
+golang-starlark (0.0~git20200901.6e684ef-1) unstable; urgency=medium
+
+  * New upstream 0.0~git20200901.6e684ef
+  * debian/control:
+    - Bump up policy version to 4.5.0 (no change required).
+
+ -- Roger Shimizu <rosh@debian.org>  Thu, 17 Sep 2020 01:10:39 +0900
+
+golang-starlark (0.0~git20190717.fc7a7f4-3) unstable; urgency=medium
+
+  * debian/rules:
+    - Skip dh_auto_test for 32-bit systems, since FTBFS on reproducible
+      builds.
+
+ -- Roger Shimizu <rosh@debian.org>  Thu, 25 Jun 2020 01:54:07 +0900
+
+golang-starlark (0.0~git20190717.fc7a7f4-2) unstable; urgency=medium
+
+  * Source only upload.
+
+ -- Roger Shimizu <rosh@debian.org>  Sat, 20 Jun 2020 00:06:53 +0900
+
+golang-starlark (0.0~git20190717.fc7a7f4-1) unstable; urgency=medium
+
+  [ Emanuel Krivoy ]
+  * Initial release (Closes: 934004)
+
+ -- Roger Shimizu <rosh@debian.org>  Fri, 19 Jun 2020 00:53:17 +0900

@@ -1,4 +1,17 @@
 #!/usr/bin/make -f
 
+# File required in tests
+export DH_GOLANG_INSTALL_EXTRA := starlarktest/assert.star
+# We want to build only the library packages themselves, not the accompanying
+# binaries.
+export DH_GOLANG_EXCLUDES := cmd/
+
 %:
-	dh $@
+	dh $@ --buildsystem=golang --with=golang
+
+# Skip dh_auto_test for 32-bit systems
+# Since FTBFS on reproducible builds
+override_dh_auto_test:
+ifeq (,$(filter armel armhf i386 mipsel hurd-i386 kfreebsd-i386,$(DEB_HOST_ARCH)))
+	dh_auto_test
+endif
