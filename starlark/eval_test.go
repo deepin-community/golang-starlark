@@ -6,6 +6,7 @@ package starlark_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"math"
 	"os/exec"
@@ -20,7 +21,6 @@ import (
 	starlarkmath "go.starlark.net/lib/math"
 	"go.starlark.net/lib/proto"
 	"go.starlark.net/lib/time"
-	"go.starlark.net/resolve"
 	"go.starlark.net/starlark"
 	"go.starlark.net/starlarkstruct"
 	"go.starlark.net/starlarktest"
@@ -31,20 +31,19 @@ import (
 )
 
 // A test may enable non-standard options by containing (e.g.) "option:recursion".
-func setOptions(src string) {
-	resolve.AllowGlobalReassign = option(src, "globalreassign")
-	resolve.LoadBindsGlobally = option(src, "loadbindsglobally")
-	resolve.AllowRecursion = option(src, "recursion")
-	resolve.AllowSet = option(src, "set")
+func getOptions(src string) *syntax.FileOptions {
+	return &syntax.FileOptions{
+		Set:               option(src, "set"),
+		While:             option(src, "while"),
+		TopLevelControl:   option(src, "toplevelcontrol"),
+		GlobalReassign:    option(src, "globalreassign"),
+		LoadBindsGlobally: option(src, "loadbindsglobally"),
+		Recursion:         option(src, "recursion"),
+	}
 }
 
 func option(chunk, name string) bool {
 	return strings.Contains(chunk, "option:"+name)
-}
-
-// Wrapper is the type of errors with an Unwrap method; see https://golang.org/pkg/errors.
-type Wrapper interface {
-	Unwrap() error
 }
 
 func TestEvalExpr(t *testing.T) {
@@ -113,7 +112,6 @@ func TestEvalExpr(t *testing.T) {
 }
 
 func TestExecFile(t *testing.T) {
-	defer setOptions("")
 	testdata := starlarktest.DataFile("starlark", ".")
 	thread := &starlark.Thread{Load: load}
 	starlarktest.SetReporter(thread, t)
@@ -139,6 +137,7 @@ func TestExecFile(t *testing.T) {
 		"testdata/tuple.star",
 		"testdata/recursion.star",
 		"testdata/module.star",
+		"testdata/while.star",
 	} {
 		filename := filepath.Join(testdata, file)
 		for _, chunk := range chunkedfile.Read(filename, t) {
@@ -148,9 +147,8 @@ func TestExecFile(t *testing.T) {
 				"struct":    starlark.NewBuiltin("struct", starlarkstruct.Make),
 			}
 
-			setOptions(chunk.Source)
-
-			_, err := starlark.ExecFile(thread, filename, chunk.Source, predeclared)
+			opts := getOptions(chunk.Source)
+			_, err := starlark.ExecFileOptions(opts, thread, filename, chunk.Source, predeclared)
 			switch err := err.(type) {
 			case *starlark.EvalError:
 				found := false
@@ -607,12 +605,10 @@ Error: cannot load crash.star: floored division by zero`
 				result = evalErr
 			}
 
-			// TODO: use errors.Unwrap when go >=1.13 is everywhere.
-			wrapper, isWrapper := err.(Wrapper)
-			if !isWrapper {
+			err = errors.Unwrap(err)
+			if err == nil {
 				break
 			}
-			err = wrapper.Unwrap()
 		}
 		return result
 	}
@@ -828,7 +824,8 @@ func TestFrameLocals(t *testing.T) {
 						buf.WriteString(", ")
 					}
 					name, _ := fn.Param(i)
-					fmt.Fprintf(buf, "%s=%s", name, fr.Local(i))
+					_, v := fr.Local(i)
+					fmt.Fprintf(buf, "%s=%s", name, v)
 				}
 			} else {
 				buf.WriteString("...") // a built-in function
@@ -1058,5 +1055,90 @@ main()
 				t.Fatalf("ExecFile returned %v, expected panic", v)
 			}
 		}()
+	}
+}
+
+func TestDebugFrame(t *testing.T) {
+	predeclared := starlark.StringDict{
+		"env": starlark.NewBuiltin("env", func(thread *starlark.Thread, b *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
+			if thread.CallStackDepth() < 2 {
+				return nil, fmt.Errorf("env must not be called directly")
+			}
+			fr := thread.DebugFrame(1) // parent
+			fn, ok := fr.Callable().(*starlark.Function)
+			if !ok {
+				return nil, fmt.Errorf("env must be called from a Starlark function")
+			}
+			dict := starlark.NewDict(0)
+			for i := 0; i < fr.NumLocals(); i++ {
+				bind, val := fr.Local(i)
+				if val == nil {
+					continue
+				}
+				dict.SetKey(starlark.String(bind.Name), val) // ignore error
+			}
+			for i := 0; i < fn.NumFreeVars(); i++ {
+				bind, val := fn.FreeVar(i)
+				dict.SetKey(starlark.String(bind.Name), val) // ignore error
+			}
+			dict.Freeze()
+			return dict, nil
+		}),
+	}
+	const src = `
+e = [None]
+
+def f(p):
+    outer = 3
+    def g(q):
+        inner = outer + 1
+        e[0] = env() # {"q": 2, "inner": 4, "outer": 3}
+	inner2 = None # not defined at call to env()
+    g(2)
+
+f(1)
+`
+	thread := new(starlark.Thread)
+	m, err := starlark.ExecFile(thread, "env.star", src, predeclared)
+	if err != nil {
+		t.Fatalf("ExecFile returned error %q, expected panic", err)
+	}
+	got := m["e"].(*starlark.List).Index(0).String()
+	want := `{"q": 2, "inner": 4, "outer": 3}`
+	if got != want {
+		t.Errorf("env() returned %s, want %s", got, want)
+	}
+}
+
+func TestUnpackArgsOptionalInference(t *testing.T) {
+	// success
+	kwargs := []starlark.Tuple{
+		{starlark.String("x"), starlark.MakeInt(1)},
+		{starlark.String("y"), starlark.MakeInt(2)},
+	}
+	var x, y, z int
+	if err := starlark.UnpackArgs("unpack", nil, kwargs,
+		"x", &x, "y?", &y, "z", &z); err != nil {
+		t.Errorf("UnpackArgs failed: %v", err)
+	}
+	got := fmt.Sprintf("x=%d y=%d z=%d", x, y, z)
+	want := "x=1 y=2 z=0"
+	if got != want {
+		t.Errorf("got %s, want %s", got, want)
+	}
+
+	// success
+	args := starlark.Tuple{starlark.MakeInt(1), starlark.MakeInt(2)}
+	x = 0
+	y = 0
+	z = 0
+	if err := starlark.UnpackArgs("unpack", args, nil,
+		"x", &x, "y?", &y, "z", &z); err != nil {
+		t.Errorf("UnpackArgs failed: %v", err)
+	}
+	got = fmt.Sprintf("x=%d y=%d z=%d", x, y, z)
+	want = "x=1 y=2 z=0"
+	if got != want {
+		t.Errorf("got %s, want %s", got, want)
 	}
 }
