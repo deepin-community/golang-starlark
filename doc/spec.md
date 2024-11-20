@@ -52,146 +52,6 @@ is run; there are no sources of random numbers, clocks, or unspecified
 iterators. This makes Starlark suitable for use in applications where
 reproducibility is paramount, such as build tools.
 
-## Contents
-
-<!-- WTF? No automatic TOC? -->
-
-  * [Overview](#overview)
-  * [Contents](#contents)
-  * [Lexical elements](#lexical-elements)
-  * [Data types](#data-types)
-    * [None](#none)
-    * [Booleans](#booleans)
-    * [Integers](#integers)
-    * [Floating-point numbers](#floating-point-numbers)
-    * [Strings](#strings)
-    * [Lists](#lists)
-    * [Tuples](#tuples)
-    * [Dictionaries](#dictionaries)
-    * [Sets](#sets)
-    * [Functions](#functions)
-    * [Built-in functions](#built-in-functions)
-  * [Name binding and variables](#name-binding-and-variables)
-  * [Value concepts](#value-concepts)
-    * [Identity and mutation](#identity-and-mutation)
-    * [Freezing a value](#freezing-a-value)
-    * [Hashing](#hashing)
-    * [Sequence types](#sequence-types)
-    * [Indexing](#indexing)
-  * [Expressions](#expressions)
-    * [Identifiers](#identifiers)
-    * [Literals](#literals)
-    * [Parenthesized expressions](#parenthesized-expressions)
-    * [Dictionary expressions](#dictionary-expressions)
-    * [List expressions](#list-expressions)
-    * [Unary operators](#unary-operators)
-    * [Binary operators](#binary-operators)
-    * [Conditional expressions](#conditional-expressions)
-    * [Comprehensions](#comprehensions)
-    * [Function and method calls](#function-and-method-calls)
-    * [Dot expressions](#dot-expressions)
-    * [Index expressions](#index-expressions)
-    * [Slice expressions](#slice-expressions)
-    * [Lambda expressions](#lambda-expressions)
-  * [Statements](#statements)
-    * [Pass statements](#pass-statements)
-    * [Assignments](#assignments)
-    * [Augmented assignments](#augmented-assignments)
-    * [Function definitions](#function-definitions)
-    * [Return statements](#return-statements)
-    * [Expression statements](#expression-statements)
-    * [If statements](#if-statements)
-    * [For loops](#for-loops)
-    * [Break and Continue](#break-and-continue)
-    * [Load statements](#load-statements)
-  * [Module execution](#module-execution)
-  * [Built-in constants and functions](#built-in-constants-and-functions)
-    * [None](#none)
-    * [True and False](#true-and-false)
-    * [any](#any)
-    * [all](#all)
-    * [bool](#bool)
-    * [chr](#chr)
-    * [dict](#dict)
-    * [dir](#dir)
-    * [enumerate](#enumerate)
-    * [fail](#fail)
-    * [float](#float)
-    * [getattr](#getattr)
-    * [hasattr](#hasattr)
-    * [hash](#hash)
-    * [int](#int)
-    * [len](#len)
-    * [list](#list)
-    * [max](#max)
-    * [min](#min)
-    * [ord](#ord)
-    * [print](#print)
-    * [range](#range)
-    * [repr](#repr)
-    * [reversed](#reversed)
-    * [set](#set)
-    * [sorted](#sorted)
-    * [str](#str)
-    * [tuple](#tuple)
-    * [type](#type)
-    * [zip](#zip)
-  * [Built-in methods](#built-in-methods)
-    * [dict·clear](#dict·clear)
-    * [dict·get](#dict·get)
-    * [dict·items](#dict·items)
-    * [dict·keys](#dict·keys)
-    * [dict·pop](#dict·pop)
-    * [dict·popitem](#dict·popitem)
-    * [dict·setdefault](#dict·setdefault)
-    * [dict·update](#dict·update)
-    * [dict·values](#dict·values)
-    * [list·append](#list·append)
-    * [list·clear](#list·clear)
-    * [list·extend](#list·extend)
-    * [list·index](#list·index)
-    * [list·insert](#list·insert)
-    * [list·pop](#list·pop)
-    * [list·remove](#list·remove)
-    * [set·union](#set·union)
-    * [string·capitalize](#string·capitalize)
-    * [string·codepoint_ords](#string·codepoint_ords)
-    * [string·codepoints](#string·codepoints)
-    * [string·count](#string·count)
-    * [string·elem_ords](#string·elem_ords)
-    * [string·elems](#string·elems)
-    * [string·endswith](#string·endswith)
-    * [string·find](#string·find)
-    * [string·format](#string·format)
-    * [string·index](#string·index)
-    * [string·isalnum](#string·isalnum)
-    * [string·isalpha](#string·isalpha)
-    * [string·isdigit](#string·isdigit)
-    * [string·islower](#string·islower)
-    * [string·isspace](#string·isspace)
-    * [string·istitle](#string·istitle)
-    * [string·isupper](#string·isupper)
-    * [string·join](#string·join)
-    * [string·lower](#string·lower)
-    * [string·lstrip](#string·lstrip)
-    * [string·partition](#string·partition)
-    * [string·removeprefix](#string·removeprefix)
-    * [string·removesuffix](#string·removesuffix)
-    * [string·replace](#string·replace)
-    * [string·rfind](#string·rfind)
-    * [string·rindex](#string·rindex)
-    * [string·rpartition](#string·rpartition)
-    * [string·rsplit](#string·rsplit)
-    * [string·rstrip](#string·rstrip)
-    * [string·split](#string·split)
-    * [string·splitlines](#string·splitlines)
-    * [string·startswith](#string·startswith)
-    * [string·strip](#string·strip)
-    * [string·title](#string·title)
-    * [string·upper](#string·upper)
-  * [Dialect differences](#dialect-differences)
-
-
 ## Lexical elements
 
 A Starlark program consists of one or more modules.
@@ -966,7 +826,20 @@ Sets are instantiated by calling the built-in `set` function, which
 returns a set containing all the elements of its optional argument,
 which must be an iterable sequence.  Sets have no literal syntax.
 
-The only method of a set is `union`, which is equivalent to the `|` operator.
+A set has these methods:
+
+* [`add`](#set·add)
+* [`clear`](#set·clear)
+* [`difference`](#set·difference)
+* [`discard`](#set·discard)
+* [`intersection`](#set·intersection)
+* [`issubset`](#set·issubset)
+* [`issuperset`](#set·issuperset)
+* [`pop`](#set·pop)
+* [`remove`](#set·remove)
+* [`symmetric_difference`](#set·symmetric_difference)
+* [`union`](#set·union)
+
 
 A set used in a Boolean context is considered true if it is non-empty.
 
@@ -1137,7 +1010,7 @@ A function call completes normally after the execution of either a
 `return` statement, or of the last statement in the function body.
 The result of the function call is the value of the return statement's
 operand, or `None` if the return statement had no operand or if the
-function completeted without executing a return statement.
+function completed without executing a return statement.
 
 ```python
 def f(x):
@@ -1322,7 +1195,7 @@ x = "hello"
 
 The same is also true for nested loops in comprehensions.
 In the (unnatural) examples below, the scope of the variables `x`, `y`, 
-and `z` is the entire compehension block, except the operand of the first
+and `z` is the entire comprehension block, except the operand of the first
 loop (`[]` or `[1]`), which is resolved in the enclosing environment.
 The second loop may thus refer to variables defined by the third (`z`),
 even though such references would fail if actually executed.
@@ -1439,7 +1312,7 @@ on the value returned by `get_filename()`.
 ## Value concepts
 
 Starlark has eleven core [data types](#data-types).  An application
-that embeds the Starlark intepreter may define additional types that
+that embeds the Starlark interpreter may define additional types that
 behave like Starlark values.  All values, whether core or
 application-defined, implement a few basic behaviors:
 
@@ -1982,6 +1855,11 @@ which breaks several mathematical identities.  For example, if `x` is
 a `NaN` value, the comparisons `x < y`, `x == y`, and `x > y` all
 yield false for all values of `y`.
 
+When used to compare two `set` objects, the `<=`, and `>=` operators will report
+whether one set is a subset or superset of another. Similarly, using `<` or `>` will
+report whether a set is a proper subset or superset of another, thus `x > y` is
+equivalent to `x >= y and x != y`.
+
 Applications may define additional types that support ordered
 comparison.
 
@@ -2032,6 +1910,8 @@ Sets
       int & int                 # bitwise intersection (AND)
       set & set                 # set intersection
       set ^ set                 # set symmetric difference
+      set - set                 # set difference
+
 
 Dict
       dict | dict               # ordered union
@@ -2102,6 +1982,7 @@ Implementations may impose a limit on the second operand of a left shift.
 set([1, 2]) & set([2, 3])       # set([2])
 set([1, 2]) | set([2, 3])       # set([1, 2, 3])
 set([1, 2]) ^ set([2, 3])       # set([1, 3])
+set([1, 2]) - set([2, 3])       # set([1])
 ```
 
 <b>Implementation note:</b>
@@ -2165,6 +2046,9 @@ Otherwise, the conversion's operand is the next element of `args`,
 which must be a tuple with exactly one component per conversion,
 unless the format string contains only a single conversion, in which
 case `args` itself is its operand.
+
+If the format string contains no conversions, the operand must be a
+`Mapping` or an empty tuple.
 
 Starlark does not support the flag, width, and padding specifiers
 supported by Python's `%` and other variants of C's `printf`.
@@ -3469,7 +3353,7 @@ shortest of the input sequences.
 ```python
 zip()                                   # []
 zip(range(5))                           # [(0,), (1,), (2,), (3,), (4,)]
-zip(range(5), "abc")                    # [(0, "a"), (1, "b"), (2, "c")]
+zip(range(5), "abc".elems())            # [(0, "a"), (1, "b"), (2, "c")]
 ```
 
 ## Built-in methods
@@ -3740,6 +3624,141 @@ x.remove(2)                             # None (x == [1, 3])
 x.remove(2)                             # error: element not found
 ```
 
+<a id='set·add'></a>
+### set·add
+
+If `x` is not an element of set `S`, `S.add(x)` adds it to the set or fails if the set is frozen.
+If `x` already an element of the set, `add(x)` has no effect.
+
+It returns None.
+
+```python
+x = set([1, 2])
+x.add(3)                             # None
+x                                    # set([1, 2, 3])
+x.add(3)                             # None
+x                                    # set([1, 2, 3])
+```
+
+<a id='set·clear'></a>
+### set·clear
+
+`S.clear()` removes all items from the set or fails if the set is non-empty and frozen.
+
+It returns None.
+
+```python
+x = set([1, 2, 3])
+x.clear(2)                               # None
+x                                        # set([])
+```
+
+<a id='set·difference'></a>
+### set·difference
+
+`S.difference(y)` returns a new set into which have been inserted all the elements of set S which are not in y.
+
+y can be any type of iterable (e.g. set, list, tuple).
+
+```python
+x = set([1, 2, 3])
+x.difference([3, 4, 5])                   # set([1, 2])
+```
+
+<a id='set·discard'></a>
+### set·discard
+
+If `x` is an element of set `S`, `S.discard(x)` removes `x` from the set, or fails if the
+set is frozen. If `x` is not an element of the set, discard has no effect.
+
+It returns None.
+
+```python
+x = set([1, 2, 3])
+x.discard(2)                             # None
+x                                        # set([1, 3])
+x.discard(2)                             # None
+x                                        # set([1, 3])
+```
+
+<a id='set·intersection'></a>
+### set·intersection
+
+`S.intersection(y)` returns a new set into which have been inserted all the elements of set S which are also in y.
+
+y can be any type of iterable (e.g. set, list, tuple).
+
+```python
+x = set([1, 2, 3])
+x.intersection([3, 4, 5])                # set([3])
+```
+
+<a id='set·issubset'></a>
+### set·issubset
+
+`S.issubset(y)` returns True if all items in S are also in y, otherwise it returns False.
+
+y can be any type of iterable (e.g. set, list, tuple).
+
+```python
+x = set([1, 2])
+x.issubset([1, 2, 3])                # True
+x.issubset([1, 3, 4])                # False
+```
+
+<a id='set·issuperset'></a>
+### set·issuperset
+
+`S.issuperset(y)` returns True if all items in y are also in S, otherwise it returns False.
+
+y can be any type of iterable (e.g. set, list, tuple).
+
+```python
+x = set([1, 2, 3])
+x.issuperset([1, 2])                 # True
+x.issuperset([1, 3, 4])              # False
+```
+
+<a id='set·pop'></a>
+### set·pop
+
+`S.pop()` removes the first inserted item from the set and returns it.
+
+`pop` fails if the set is empty or frozen.
+
+```python
+x = set([1, 2])
+x.pop()                                 # 1
+x.pop()                                 # 2
+x.pop()                                 # error: empty set
+```
+
+<a id='set·remove'></a>
+### set·remove
+
+`S.remove(x)` removes `x` from the set and returns None.
+
+`remove` fails if the set does not contain `x` or is frozen.
+
+```python
+x = set([1, 2, 3])
+x.remove(2)                             # None
+x                                       # set([1, 3])
+x.remove(2)                             # error: element not found
+```
+
+<a id='set·symmetric_difference'></a>
+### set·symmetric_difference
+
+`S.symmetric_difference(y)` creates a new set into which is inserted all of the items which are in S but not y, followed by all of the items which are in y but not S.
+
+y can be any type of iterable (e.g. set, list, tuple).
+
+```python
+x = set([1, 2, 3])
+x.symmetric_difference([3, 4, 5])         # set([1, 2, 4, 5])
+```
+
 <a id='set·union'></a>
 ### set·union
 
@@ -3814,7 +3833,7 @@ See also: `string·codepoints`.
 <a id='string·count'></a>
 ### string·count
 
-`S.count(sub[, start[, end]])` returns the number of occcurences of
+`S.count(sub[, start[, end]])` returns the number of occurrences of
 `sub` within the string S, or, if the optional substring indices
 `start` and `end` are provided, within the designated substring of S.
 They are interpreted according to Starlark's [indexing conventions](#indexing).
